@@ -1,0 +1,11 @@
+container:
+  evidence:
+    - "Dockerfile"
+    - "docker-compose.yml"
+    - ".dockerignore"
+
+ci-cd:
+  evidence:
+    - ".github/workflows/"
+    - "Jenkinsfile"
+    - ".gitlab-ci.yml"
