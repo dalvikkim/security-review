@@ -25,26 +25,7 @@ This skill may be used to:
 
 ---
 
-## Activation Rules (Strict)
-
-This skill MUST ONLY activate when the user explicitly requests one of the following:
-- Security best practices
-- Security review or security report
-- Secure-by-default design or coding guidance
-- Hardening or security improvement of an existing codebase
-
-This skill MUST NOT activate for:
-- General code review
-- Debugging or error fixing
-- Performance optimization
-- Refactoring without a security focus
-- Feature development without an explicit security request
-
-If the request is ambiguous, ask the user to confirm whether a **security-focused review** is desired before proceeding.
-
----
-
-## Sensitive Findings Handling (Do-Not-Send Policy)
+## Sensitive Findings Handling (Strict Do-Not-Send Policy)
 
 The agent MUST detect hardcoded credentials and secrets, but MUST NOT send any secret material
 (or secret-containing findings) to the LLM.
@@ -71,6 +52,25 @@ When a Do-Not-Send finding is detected:
 - Replace secret values with "[REDACTED]"
 - Never send full lines containing secrets to the LLM
 - Never send stack traces or logs that might contain secrets
+
+---
+
+## Activation Rules (Strict)
+
+This skill MUST ONLY activate when the user explicitly requests one of the following:
+- Security best practices
+- Security review or security report
+- Secure-by-default design or coding guidance
+- Hardening or security improvement of an existing codebase
+
+This skill MUST NOT activate for:
+- General code review
+- Debugging or error fixing
+- Performance optimization
+- Refactoring without a security focus
+- Feature development without an explicit security request
+
+If the request is ambiguous, ask the user to confirm whether a **security-focused review** is desired before proceeding.
 
 ---
 
