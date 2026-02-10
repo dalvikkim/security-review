@@ -75,6 +75,14 @@ Secrets(비밀정보)는 노출 즉시 **시스템 전체가 침해될 수 있�
 
 ---
 
+## Handling Secrets in Automation / LLM Workflows
+
+- Never send secret values to external services or LLMs.
+- If analysis is needed, send only redacted metadata (path, line, type).
+- Prefer local-only detection and remediation guidance for any secret findings.
+
+---
+
 ## High-Risk Patterns
 
 - `API_KEY=xxxx` 형태 문자열이 코드에 존재
@@ -82,6 +90,36 @@ Secrets(비밀정보)는 노출 즉시 **시스템 전체가 침해될 수 있�
 - Dockerfile에 `ENV SECRET=...`
 - 테스트용 Secret을 운영 환경에서 재사용
 
+## Empty Password / Blank Credential (Detection Rule)
+
+빈 문자열 `""` 또는 공백만 있는 문자열로 password/secret/credential 값을 초기화하거나 전달하는 패턴은
+**Password management: empty password**로 분류한다.
+
+### Treat as Finding when
+
+- key name이 아래 중 하나에 해당하고 값이 `""` 또는 공백 문자열인 경우:
+  - `password`, `passwd`, `pwd`
+  - `pass`, `passphrase`
+  - `secret`, `clientSecret`, `apiSecret`
+  - `token` (단, 빈 문자열이 인증 흐름에 영향을 주는 경우)
+
+### Examples (Red Flag)
+
+- `password: ""`
+- `password = ""`
+- `const password = ""`
+- `process.env.PASSWORD || ""`  (기본값이 빈 문자열)
+
+### Impact
+
+빈 비밀번호 허용/우회로 인해 인증이 무력화되거나, “비밀번호 미설정 상태”가 운영까지 전파될 수 있다.
+
+### Recommended Fix
+
+- 개발용 기본값을 두더라도 `""`로 두지 말고,
+  - (1) **필수 값이면** 시작 시점에 누락 시 실패(fail-fast)
+  - (2) **선택 값이면** `null/undefined`로 표현하고, 명시적으로 분기 처리
+- 운영 환경에서는 secret store/환경변수에서 주입되도록 강제한다.
 ---
 
 ## Verification Checklist

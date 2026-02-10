@@ -11,3 +11,10 @@ secrets-management:
     - 'password:\s*""'
     - 'password\s*=\s*""'
     - 'passwd:\s*""'
+policies:
+  do_not_send_domains:
+    - secrets-management
+    - private-keys
+  do_not_send_rules:
+    - hardcoded-credential
+    - hardcoded-api-key

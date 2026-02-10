@@ -44,6 +44,36 @@ If the request is ambiguous, ask the user to confirm whether a **security-focuse
 
 ---
 
+## Sensitive Findings Handling (Do-Not-Send Policy)
+
+The agent MUST detect hardcoded credentials and secrets, but MUST NOT send any secret material
+(or secret-containing findings) to the LLM.
+
+### Definition: Do-Not-Send Findings
+Treat the following as Do-Not-Send findings:
+- Hardcoded credentials (passwords, tokens, API keys, private keys, client secrets)
+- Embedded secrets in connection strings (db urls with credentials)
+- Any finding that includes a raw secret value, even if masked is possible
+
+### Required Behavior
+When a Do-Not-Send finding is detected:
+1) Record the finding locally (file/report/log) WITHOUT including the raw secret value
+2) Provide user-visible guidance (what/where/how to fix) with redacted value
+3) Do NOT include the finding in any prompt to the LLM
+4) If summarizing to the user, include only:
+   - file path
+   - line number
+   - secret type (e.g., password/token)
+   - safe remediation steps
+   - NEVER the secret value
+
+### Redaction Rule (if any metadata must be shared)
+- Replace secret values with "[REDACTED]"
+- Never send full lines containing secrets to the LLM
+- Never send stack traces or logs that might contain secrets
+
+---
+
 ## Core Workflow
 
 ### Step 1: Identify Technical Context
