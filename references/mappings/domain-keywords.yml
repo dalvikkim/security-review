@@ -1,0 +1,13 @@
+secrets-management:
+  keywords:
+    - "password:"
+    - "passwd"
+    - "pwd"
+    - "passphrase"
+    - "clientSecret"
+    - "apiSecret"
+    - "empty password"
+  red_flags:
+    - 'password:\s*""'
+    - 'password\s*=\s*""'
+    - 'passwd:\s*""'
