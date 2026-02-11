@@ -1,16 +1,16 @@
 ---
 
-name: "security-best-practices"
+name: "security-review"
 
-description: "Perform security best-practice reviews and suggest improvements in a language-agnostic manner. Trigger only when the user explicitly requests security best practices guidance, a security review/report, or secure-by-default coding help. Applicable to any programming language or framework. Prefer project-specific or reference documentation when available; otherwise rely on widely accepted security standards and official documentation."
+description: "Perform security reviews and suggest improvements in a language-agnostic manner. Trigger only when the user explicitly requests security guidance, a security review/report, or secure-by-default coding help. Applicable to any programming language or framework. Prefer project-specific or reference documentation when available; otherwise rely on widely accepted security standards and official documentation."
 
 ---
 
-# Security Best Practices (Language-Agnostic)
+# Security Review (Language-Agnostic)
 
 ## Overview
 
-This skill defines how to perform **security best-practice analysis independently of programming language or framework**.
+This skill defines how to perform **security analysis independently of programming language or framework**.
 
 The goal of this skill is to ensure that the assistant:
 - Acts only when explicitly asked for security guidance
@@ -21,7 +21,7 @@ The goal of this skill is to ensure that the assistant:
 This skill may be used to:
 - Write new code that is secure by default
 - Passively identify high-impact security issues
-- Produce a formal security best practices report with suggested fixes
+- Produce a formal security review report with suggested fixes
 
 ---
 
@@ -58,7 +58,6 @@ When a Do-Not-Send finding is detected:
 ## Activation Rules (Strict)
 
 This skill MUST ONLY activate when the user explicitly requests one of the following:
-- Security best practices
 - Security review or security report
 - Secure-by-default design or coding guidance
 - Hardening or security improvement of an existing codebase
@@ -140,10 +139,10 @@ While working on code:
 
 ---
 
-### Mode 3: Security Best Practices Report
+### Mode 3: Security Review Report
 
 When explicitly requested:
-- Produce a full security best practices report
+- Produce a full security review report
 - Prioritize findings by severity and urgency
 - Suggest concrete remediation steps
 - Offer to apply fixes incrementally
@@ -155,7 +154,7 @@ When explicitly requested:
 When producing a report:
 
 - Write the report as a Markdown file  
-  Default filename: `security_best_practices_report.md`
+  Default filename: `security_review_report.md`
 - Ask the user for a preferred location if not specified
 
 ### Report Structure
@@ -188,7 +187,7 @@ If fixes are requested:
 
 - Address **one finding at a time**
 - Add concise comments explaining:
-  - Which security best practice is being applied
+  - Which security review is being applied
   - Why the previous approach was risky
 - Carefully consider backward compatibility and regressions
 - Warn the user if behavior or assumptions may change
@@ -200,7 +199,7 @@ Avoid bundling unrelated security fixes into a single change.
 
 ## Overrides and Exceptions
 
-Projects may intentionally bypass certain security best practices due to:
+Projects may intentionally bypass certain security review due to:
 - Legacy constraints
 - Operational requirements
 - Environmental limitations

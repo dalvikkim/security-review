@@ -18,3 +18,9 @@ policies:
   do_not_send_rules:
     - hardcoded-credential
     - hardcoded-api-key
+container-build:
+  keywords: ["Dockerfile", "FROM", "USER", "ADD", "apt-get", "apk add"]
+  red_flags:
+    - "FROM\\s+.+:latest"
+    - "^\\s*USER\\s+root"
+    - "curl\\s+.+\\|\\s*(sh|bash)"
