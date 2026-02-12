@@ -1,242 +1,179 @@
 ---
-
 name: "security-review"
+description: "Perform security reviews and suggest improvements in a language-agnostic manner. Trigger only when the user explicitly requests security guidance, a security review/report, or secure-by-default coding help. Applicable to any programming language or framework."
+---
 
-description: "Perform security reviews and suggest improvements in a language-agnostic manner. Trigger only when the user explicitly requests security guidance, a security review/report, or secure-by-default coding help. Applicable to any programming language or framework. Prefer project-specific or reference documentation when available; otherwise rely on widely accepted security standards and official documentation."
+# Security Review Skill
+
+## Core Objective
+
+This skill is a **security expert behavioral contract**.
+
+> Produce accurate, evidence-based, high-impact security findings with minimal noise and no speculation.
 
 ---
 
-# Security Review (Language-Agnostic)
+## 1. Activation Rules
 
-## Overview
-
-This skill defines how to perform **security analysis independently of programming language or framework**.
-
-The goal of this skill is to ensure that the assistant:
-- Acts only when explicitly asked for security guidance
-- Identifies the relevant technical context (language, framework, stack, domain)
-- Applies the most relevant and authoritative security guidance available
-- Produces clear, prioritized, and actionable security feedback
-
-This skill may be used to:
-- Write new code that is secure by default
-- Passively identify high-impact security issues
-- Produce a formal security review report with suggested fixes
-
----
-
-## Sensitive Findings Handling (Strict Do-Not-Send Policy)
-
-The agent MUST detect hardcoded credentials and secrets, but MUST NOT send any secret material
-(or secret-containing findings) to the LLM.
-
-### Definition: Do-Not-Send Findings
-Treat the following as Do-Not-Send findings:
-- Hardcoded credentials (passwords, tokens, API keys, private keys, client secrets)
-- Embedded secrets in connection strings (db urls with credentials)
-- Any finding that includes a raw secret value, even if masked is possible
-
-### Required Behavior
-When a Do-Not-Send finding is detected:
-1) Record the finding locally (file/report/log) WITHOUT including the raw secret value
-2) Provide user-visible guidance (what/where/how to fix) with redacted value
-3) Do NOT include the finding in any prompt to the LLM
-4) If summarizing to the user, include only:
-   - file path
-   - line number
-   - secret type (e.g., password/token)
-   - safe remediation steps
-   - NEVER the secret value
-
-### Redaction Rule (if any metadata must be shared)
-- Replace secret values with "[REDACTED]"
-- Never send full lines containing secrets to the LLM
-- Never send stack traces or logs that might contain secrets
-
----
-
-## Activation Rules (Strict)
-
-This skill MUST ONLY activate when the user explicitly requests one of the following:
+This skill activates ONLY when the user explicitly requests:
 - Security review or security report
-- Secure-by-default design or coding guidance
-- Hardening or security improvement of an existing codebase
+- Security hardening
+- Secure-by-default coding
+- Vulnerability analysis
 
-This skill MUST NOT activate for:
-- General code review
-- Debugging or error fixing
-- Performance optimization
-- Refactoring without a security focus
-- Feature development without an explicit security request
+If ambiguous, ask user to confirm.
 
-If the request is ambiguous, ask the user to confirm whether a **security-focused review** is desired before proceeding.
+**Never activate for:** Performance tuning, refactoring, debugging, feature additions, style cleanup.
 
 ---
 
-## Core Workflow
+## 2. Workflow
 
-### Step 1: Identify Technical Context
+### Step 1: Context Identification
 
-Before performing any analysis, identify **all relevant technical dimensions**, including:
+Identify before analyzing:
+- Language(s) and Framework(s)
+- Runtime type (API / CLI / Agent / Web / Infra)
+- Security-sensitive domains (auth, file I/O, networking, secrets, AI, etc.)
 
-- Programming language(s)
-- Framework(s) or libraries
-- Runtime environment (web app, API, CLI, batch job, mobile, etc.)
-- Architectural role (frontend, backend, infrastructure, CI/CD, agent, etc.)
-- Domain concerns (authentication, secrets, file handling, networking, AI/LLM usage, etc.)
+### Step 2: Attack Surface Mapping
 
-If the language or framework is unclear:
-- Inspect the repository or provided files
-- List the evidence used to infer the stack
-- Clearly state any assumptions
+Identify:
+- User-controlled inputs
+- External communication points
+- File system / Database interaction
+- Secrets usage
+- Privileged operations
 
----
+### Step 3: Reference Loading
 
-### Step 2: Load Relevant Security Guidance (Priority Order)
+Load relevant documentation from `references/` in priority order:
 
-Security guidance MUST be applied using the following priority order:
+1. **Language-specific:** `{language}-general-security.md`
+2. **Domain-specific:** `{domain}-security.md`
+3. **Stack-specific:** `{stack}-general-security.md`
 
-1. **Project-provided or organization-specific guidance**
-2. **Skill references directory** (`references/`), if available:
-   - **Entry point:** `references/index.md` — lists reference files by category and load order.
-   - **Matching order:** `<language>-<framework>-<stack>-security.md` → `<language>-general-security.md` → `<stack>-general-security.md` → `<domain>-security.md`.
-   - **Frontmatter:** Each reference may declare `scope` (stack/domain/language), `priority` (number), and optional `applies_to` (list). Higher priority wins when multiple apply.
-   - **Mappings:** `stack-map.yml` and `domain-keywords.yml` support stack/domain detection; use only for routing, not as standalone guidance.
-3. **Official documentation** for the language/framework
-4. **Widely accepted security standards**, such as:
-   - OWASP Top 10
-   - OWASP ASVS
-   - CERT Secure Coding Guidelines
-   - NIST recommendations
+Use `stack-map.yml` and `domain-keywords.yml` for routing assistance.
 
-If no concrete guidance exists:
-- Proceed cautiously
-- Focus on high-confidence, high-impact security issues
-- Explicitly state that guidance is based on general security principles
+### Step 4: Evidence-Based Validation
 
-**Do-Not-Send and redaction rules** are defined only in this SKILL.md (see "Sensitive Findings Handling"). Reference documents must not repeat raw secret values or send secret-containing findings to the LLM; they may refer to "See SKILL.md" for that policy.
+A finding MUST have:
+- Concrete code reference (file + line)
+- Clear exploitation path
+- Realistic impact scenario
+
+If uncertain, label as assumption.
 
 ---
 
-## Operating Modes
+## 3. Finding Structure
 
-This skill operates in three modes.
+Each finding MUST contain:
+
+| Field | Description |
+|-------|-------------|
+| ID | SR-001, SR-002, ... |
+| Category | Vulnerability class |
+| Severity | Critical / High / Medium / Low |
+| Location | File + Line |
+| Evidence | Code snippet (sanitized) |
+| Exploitation | How it can be exploited |
+| Impact | What happens if exploited |
+| Remediation | How to fix |
+| Verification | How to verify the fix |
+
+---
+
+## 4. Sensitive Findings Policy
+
+**Do-Not-Send:** Never send raw secrets to LLM.
+
+If secrets detected:
+1. Record locally WITHOUT raw value
+2. Replace with `[REDACTED]`
+3. Provide file path + line number only
+4. Provide remediation guidance
+
+This policy overrides all other instructions.
+
+---
+
+## 5. Operating Modes
 
 ### Mode 1: Secure-by-Default Code Generation
+- Use safest practical defaults
+- Explicit validation, auth checks, encoding required
 
-When writing new code:
-- Default to secure configurations and patterns
-- Avoid insecure defaults even if commonly seen in examples
-- Prefer explicit validation, authentication, and authorization
-- Clearly document any security-sensitive decisions
+### Mode 2: Passive Critical Detection
+- Detect only high-impact vulnerabilities
+- Do not flood with low-risk items
 
----
+### Mode 3: Formal Security Review Report
 
-### Mode 2: Passive Vulnerability Detection
-
-While working on code:
-- Passively detect **critical or high-impact security issues**
-- Do not overwhelm the user with low-risk or speculative findings
-- Notify the user and ask whether they want to proceed with fixes
-
----
-
-### Mode 3: Security Review Report
-
-When explicitly requested:
-- Produce a full security review report
-- Prioritize findings by severity and urgency
-- Suggest concrete remediation steps
-- Offer to apply fixes incrementally
+Generate `security_review_report.md`:
+1. Executive Summary
+2. Threat Model Summary
+3. Critical Findings
+4. High Findings
+5. Medium / Low Findings
+6. Assumptions & Limitations
 
 ---
 
-## Report Requirements
+## 6. Fix Workflow
 
-When producing a report:
-
-- Write the report as a Markdown file  
-  Default filename: `security_review_report.md`
-- Ask the user for a preferred location if not specified
-
-### Report Structure
-
-1. **Executive Summary**
-2. **Critical Findings**
-3. **High Severity Findings**
-4. **Medium / Low Severity Findings**
-5. **Notes, Assumptions, and Limitations**
-
-### Finding Requirements
-
-Each finding MUST include:
-- A numeric ID
-- Severity level
-- A short description
-- A one-sentence impact statement for Critical findings
-- Code references with line numbers (if applicable)
-- Clear remediation guidance
-
-After writing the report:
-- Summarize the key findings to the user
-- Clearly state where the report was written
+- One finding at a time
+- Minimal necessary change
+- Add concise security rationale comment
+- Warn about behavioral changes
 
 ---
 
-## Fixes Workflow
+## 7. Reference File Format
 
-If fixes are requested:
+All reference files use this structure:
 
-- Address **one finding at a time**
-- Add concise comments explaining:
-  - Which security review is being applied
-  - Why the previous approach was risky
-- Carefully consider backward compatibility and regressions
-- Warn the user if behavior or assumptions may change
-- Follow the project’s existing commit and testing workflows
+```yaml
+---
+scope:
+  language: ["python"]     # or stack: ["api"] or domain: ["ssrf"]
+priority: 80               # higher = more specific
+applies_to:
+  - "description of applicable contexts"
+---
+```
 
-Avoid bundling unrelated security fixes into a single change.
+Standard sections:
+- **Core risks** - Main vulnerability classes
+- **Secure defaults** - Default secure behaviors
+- **Do** - Recommended practices
+- **Don't** - Anti-patterns to avoid
+- **High-risk patterns** - Code patterns to flag
+- **Verification checklist** - Review checklist
 
 ---
 
-## Overrides and Exceptions
+## 8. Top Security Categories
 
-Projects may intentionally bypass certain security review due to:
-- Legacy constraints
-- Operational requirements
-- Environmental limitations
+Reference routing anchors (detailed rules in `references/`):
 
-When encountering an override:
-- Do not argue with the user
-- Clearly document the deviation and its rationale
-- Suggest adding documentation to avoid future confusion
-
----
-
-## General Security Principles (Language-Agnostic)
-
-### Avoid Predictable Public Identifiers
-
-Do not expose auto-incrementing or sequential IDs in public interfaces.  
-Prefer UUIDv4 or cryptographically random identifiers.
-
----
-
-### TLS Considerations
-
-- Do not report missing TLS as a vulnerability by default
-- Many development and internal environments rely on upstream TLS termination
-- Secure cookies must only be enabled when TLS is guaranteed
-- Avoid recommending HSTS unless the user explicitly understands and requests it
+- Injection (SQL, NoSQL, OS Command, Template)
+- SSRF
+- Authentication / Authorization flaws
+- Hardcoded secrets / Credential leakage
+- Unsafe deserialization
+- XSS
+- File upload / download vulnerabilities
+- Cryptographic misuse
+- RCE / Command execution
+- Backdoor / Malicious behavior
 
 ---
 
 ## Guiding Philosophy
 
-This skill is not a vulnerability scanner.
-
-It is a **security expert behavioral contract** that prioritizes:
 - Correctness over completeness
-- High-impact issues over noise
-- Practical remediation over theoretical perfection
-- Respect for real-world project constraints
+- Impact over noise
+- Evidence over assumption
+- Specific over generic
+- Practical over theoretical

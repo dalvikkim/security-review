@@ -2,54 +2,50 @@
 scope:
   language: ["python"]
 priority: 80
-applies_to:
-  - "web backends"
-  - "automation/agents"
-  - "data pipelines"
 ---
 
-# Python General Security
+# Python Security
 
-## Core risks
+## Core Risks
 
 - Injection: SQL/NoSQL, command, template
-- Unsafe deserialization (pickle)
+- Unsafe deserialization (pickle, yaml.load)
 - SSRF and unchecked outbound requests
 - Secrets in logs/env/config
 - Supply-chain (typosquatting, vulnerable versions)
 
-## Secure defaults
+## Secure Defaults
 
-- Use input validation/schema (e.g. pydantic) to define trust boundaries.
-- Use parameterized queries or ORM for DB.
-- Minimize OS commands; if needed, allowlist + argument list (no shell).
-- Avoid pickle and yaml.load(unsafe); mask tokens/passwords in logging.
+- Use input validation/schema (pydantic) for trust boundaries
+- Use parameterized queries or ORM for DB
+- Minimize OS commands; use argument list (no shell)
+- Avoid pickle and unsafe yaml.load
 
 ## Do
 
-- **SQL:** Use bound parameters (?, %s, named params).
-- **Outbound:** Allowlist, timeout, redirect limits, response size limits.
-- **Files:** Separate upload/download paths; normalize paths; validate extension and content.
-- **Packages:** Pin versions, lockfile, updates, SBOM/Dependabot or similar scans.
+- Use bound parameters for SQL (?, %s, named params)
+- Set timeout, allowlist, redirect limits for HTTP clients
+- Normalize file paths; validate extension and content
+- Pin versions, use lockfile, run dependency scans
 
 ## Don't
 
-- Use eval/exec on user input.
-- Use subprocess with shell=True and user input.
-- Use pickle.loads on untrusted data.
-- Log or expose secrets in exceptions.
+- Use `eval`/`exec` on user input
+- Use `subprocess` with `shell=True` and user input
+- Use `pickle.loads` on untrusted data
+- Log secrets or include in exceptions
 
-## High-risk patterns
+## High-Risk Patterns
 
-- requests.get(user_url) (SSRF)
-- os.system("cmd " + user) or subprocess.run(user_string, shell=True)
-- Raw HTML in templates (bypassing framework escaping)
-- Debug mode left enabled
+- `requests.get(user_url)` without validation
+- `os.system("cmd " + user)`
+- `subprocess.run(user_string, shell=True)`
+- Debug mode left enabled in production
 
-## Verification checklist
+## Verification Checklist
 
-- [ ] No direct use of untrusted input in DB/OS/templates
+- [ ] No untrusted input in DB/OS/templates
 - [ ] No pickle or unsafe YAML loading
-- [ ] HTTP clients have timeout/allowlist/redirect limits
-- [ ] No secrets in code/logs/repo
-- [ ] Dependencies pinned and scan/update process in place
+- [ ] HTTP clients have timeout/allowlist
+- [ ] No secrets in code/logs
+- [ ] Dependencies pinned and scanned

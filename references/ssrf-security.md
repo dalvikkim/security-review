@@ -2,30 +2,23 @@
 scope:
   domain: ["ssrf"]
 priority: 95
-applies_to:
-  - "services making outbound HTTP/HTTPS requests"
-  - "URL, webhook, callback, proxy features"
 ---
 
 # SSRF Security
 
-## Overview
-
-SSRF lets an attacker make the server request attacker-controlled URLs, leading to internal network access, metadata theft, or privilege escalation. Applies to any code that performs outbound requests.
-
-## Entry points
+## Entry Points
 
 - URL parameters, webhook/callback URLs
 - File download via URL, proxy/fetch/scraper features
 - LLM tool/agent URL fetch
 
-## Secure defaults
+## Secure Defaults
 
-- Never request user-supplied URLs directly.
-- Block access to internal networks by default.
-- Minimize outbound requests.
+- Never request user-supplied URLs directly
+- Block access to internal networks by default
+- Minimize outbound requests
 
-## High-risk targets
+## High-Risk Targets
 
 - localhost, 127.0.0.1
 - 169.254.169.254 (cloud metadata)
@@ -34,34 +27,32 @@ SSRF lets an attacker make the server request attacker-controlled URLs, leading 
 
 ## Defenses
 
-- **Input:** URL allowlist, restrict scheme (e.g. https only), block raw IP.
-- **Network:** Egress firewall, block metadata endpoints, consider DNS rebinding.
-- **Request:** Limit redirects, set timeout and response size limits.
+- **Input:** URL allowlist, restrict scheme (https only), block raw IP
+- **Network:** Egress firewall, block metadata endpoints
+- **Request:** Limit redirects, set timeout and response size limits
 
 ## Do
 
-- Re-validate host/IP after parsing URL.
-- Check DNS result against allowlist/blocklist.
-- Block internal IP ranges.
-- Minimize outbound call surface.
+- Re-validate host/IP after parsing URL
+- Check DNS result against allowlist/blocklist
+- Block internal IP ranges
 
 ## Don't
 
-- Call `fetch(userInputUrl)` or equivalent without validation.
-- Rely on string checks alone for URL filtering.
-- Allow unlimited redirects.
-- Assume "external API" implies safety.
+- Call `fetch(userInputUrl)` without validation
+- Rely on string checks alone for URL filtering
+- Allow unlimited redirects
 
-## High-risk patterns
+## High-Risk Patterns
 
-- Passing URL directly to HTTP client.
-- Storing webhook URL in DB and reusing without re-validation.
-- LLM agent able to fetch arbitrary URLs.
-- Invoking curl/wget with user-controlled URL.
+- Passing URL directly to HTTP client
+- Storing webhook URL and reusing without re-validation
+- LLM agent able to fetch arbitrary URLs
+- Invoking curl/wget with user-controlled URL
 
-## Verification checklist
+## Verification Checklist
 
-- [ ] No user-controlled URL used for outbound request without validation
+- [ ] No user-controlled URL used without validation
 - [ ] Internal IP and metadata access blocked
 - [ ] Redirect handling limited
 - [ ] Egress policy documented or enforced

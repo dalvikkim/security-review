@@ -1,53 +1,49 @@
 ---
 scope:
-  language: ["javascript"]
+  language: ["javascript", "typescript"]
 priority: 80
-applies_to:
-  - "node backends"
-  - "browser frontends"
-  - "shared libraries"
 ---
 
-# JavaScript General Security
+# JavaScript / TypeScript Security
 
-## Core risks
+## Core Risks
 
 - XSS (DOM manipulation, innerHTML)
 - Prototype pollution
-- Injection (SQL/NoSQL/command), mainly on Node
+- Injection (SQL/NoSQL/command) on Node.js
 - SSRF (server-side fetch/axios)
 - Dependency/supply-chain (npm)
 
-## Secure defaults
+## Secure Defaults
 
-- **DOM:** Avoid innerHTML and dangerouslySetInnerHTML with untrusted data.
-- **Node:** Input validation (schema), parameterized queries; minimize subprocess use.
-- **Packages:** Use lockfile, pin versions, update regularly, run vulnerability scans.
+- **DOM:** Avoid innerHTML with untrusted data
+- **Node:** Input validation (schema), parameterized queries
+- **Packages:** Use lockfile, pin versions, run vulnerability scans
 
 ## Do
 
-- Validate and normalize user input.
-- **Cookies/session:** Prefer httpOnly, sameSite set by server.
-- **Outbound:** Allowlist, timeout, redirect limits, response size limits.
-- **JSON/merge:** Guard against prototype pollution in deep merge (filter __proto__, constructor).
+- Validate and normalize user input
+- Use httpOnly, sameSite cookies
+- Guard against prototype pollution (filter `__proto__`, `constructor`)
+- Set timeout, redirect limits on outbound requests
 
 ## Don't
 
-- Pass user input to eval or new Function.
-- Use child_process.exec(userInput).
-- Pass user-controlled objects directly into NoSQL queries.
-- Use vulnerable or unpinned packages.
+- Pass user input to `eval` or `new Function`
+- Use `child_process.exec(userInput)`
+- Pass user objects directly into NoSQL queries
+- Use unpinned or vulnerable packages
 
-## High-risk patterns
+## High-Risk Patterns
 
-- element.innerHTML = userInput
-- Object.assign({}, userObj) or deep merge without key filtering (__proto__, constructor)
-- fetch(userUrl) on server (SSRF)
-- exec("cmd " + user)
+- `element.innerHTML = userInput`
+- `Object.assign({}, userObj)` without key filtering
+- `fetch(userUrl)` on server without validation
+- `exec("cmd " + user)`
 
-## Verification checklist
+## Verification Checklist
 
-- [ ] XSS-prone APIs (e.g. innerHTML) reviewed
-- [ ] Prototype pollution guarded (key filtering)
-- [ ] SSRF controls (allowlist/timeout/redirect)
-- [ ] Dependencies locked, pinned, scanned
+- [ ] XSS-prone APIs reviewed
+- [ ] Prototype pollution guarded
+- [ ] SSRF controls in place
+- [ ] Dependencies locked and scanned

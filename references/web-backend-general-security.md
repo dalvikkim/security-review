@@ -4,22 +4,34 @@ scope:
 priority: 85
 ---
 
-# Web Backend General Security
+# Web Backend Security
 
-## Secure defaults
+## Secure Defaults
 
-- Enable CSRF protection by default.
-- Use server-validated sessions.
-- Minimize direct filesystem access from request handling.
+- Enable CSRF protection by default
+- Use server-validated sessions
+- Minimize direct filesystem access from request handling
 
-## Common pitfalls
+## Common Pitfalls
 
-- Trusting framework defaults without review.
-- Leaving debug mode enabled.
-- Hardcoding internal IPs/URLs.
+- Trusting framework defaults without review
+- Leaving debug mode enabled in production
+- Hardcoding internal IPs/URLs
 
-## Verification checklist
+## Do
 
-- [ ] CSRF token verification
+- Separate debug/dev settings from production
+- Use secure session configuration
+- Implement proper error handling without leaking internals
+
+## Don't
+
+- Disable security features for convenience
+- Trust client-side data for server decisions
+- Expose detailed error messages
+
+## Verification Checklist
+
+- [ ] CSRF token verification enabled
 - [ ] Debug/dev settings separated from production
-- [ ] Session hijacking mitigations considered
+- [ ] Session security configured (httpOnly, secure, sameSite)

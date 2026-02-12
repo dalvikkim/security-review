@@ -6,13 +6,13 @@ priority: 90
 
 # File Upload & Download Security
 
-## Secure defaults
+## Secure Defaults
 
-- Validate file type on the server.
-- Use a dedicated upload directory (outside webroot when possible).
-- Remove execute permission from uploaded files.
+- Validate file type on server (not just extension)
+- Use dedicated upload directory outside webroot
+- Remove execute permission from uploaded files
 
-## Common attacks
+## Common Attacks
 
 - Web shell upload
 - Path traversal
@@ -20,5 +20,26 @@ priority: 90
 
 ## Do
 
-- Use random or non-guessable filenames for stored uploads.
-- Set Content-Disposition for downloads (avoid script execution).
+- Use random/non-guessable filenames for stored uploads
+- Set Content-Disposition header for downloads
+- Validate file content, not just extension
+- Limit file size
+
+## Don't
+
+- Trust client-provided filename directly
+- Store uploads in publicly accessible directories
+- Allow path characters in filenames
+
+## High-Risk Patterns
+
+- `save(userFilename)` without sanitization
+- Path concatenation with user input
+- Missing content-type validation
+
+## Verification Checklist
+
+- [ ] Server-side file type validation
+- [ ] Filenames sanitized before storage
+- [ ] Upload directory isolated from webroot
+- [ ] Content-Disposition set for downloads

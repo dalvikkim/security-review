@@ -1,73 +1,60 @@
 ---
 scope:
-  stack: ["container", "ci-cd"]
-  domain: ["container-build", "supply-chain", "secrets-management"]
+  stack: ["container"]
+  domain: ["container-build"]
 priority: 95
-applies_to:
-  - "Dockerfile"
-  - "container image build pipelines"
 ---
 
 # Docker / Container Security
 
-## Review targets
+## Review Targets
 
 - Dockerfile: FROM, RUN, COPY/ADD, USER, ENTRYPOINT/CMD
 - Base image choice and pinning
 - Secrets and build args
 - File permissions and ownership
-- Non-root runtime, minimal packages
-- Supply-chain (integrity, provenance)
 
-## Critical (must fix)
+## Critical Issues
 
-**1. Running as root**  
-Rule: Final image must run as non-root.  
-Detect: No USER or USER root in final stage.  
-Fix: Add dedicated user/group and set USER.
+**Running as root**
+- Rule: Final image must run as non-root
+- Detect: No USER or `USER root` in final stage
+- Fix: Add dedicated user/group and set USER
 
-**2. Secrets in image layers**  
-Rule: Never embed secrets in Dockerfile layers.  
-Detect: ENV/ARG/RUN with tokens/passwords/keys; .env copied.  
-Fix: Use BuildKit secrets, runtime env, or secret stores.
+**Secrets in image layers**
+- Rule: Never embed secrets in Dockerfile layers
+- Detect: ENV/ARG/RUN with tokens/passwords/keys
+- Fix: Use BuildKit secrets, runtime env, or secret stores
 
-**3. Unpinned base / latest**  
-Rule: Pin to digest or fixed version.  
-Detect: FROM image:latest or no tag.  
-Fix: Use image@sha256:<digest> or explicit version.
+**Unpinned base image**
+- Rule: Pin to digest or fixed version
+- Detect: `FROM image:latest` or no tag
+- Fix: Use `image@sha256:<digest>` or explicit version
 
-## High severity
+## High Severity Issues
 
-**4. Unsafe package installs**  
-Rule: Minimize packages; remove package manager caches.  
-Detect: apt-get install without cleanup; build tools in final stage.  
-Fix: Multi-stage build; rm -rf /var/lib/apt/lists/* after install.
+**Unsafe package installs**
+- Minimize packages; remove package manager caches
+- Use multi-stage builds; clean apt lists after install
 
-**5. ADD instead of COPY**  
-Rule: Prefer COPY unless ADD behavior is required.  
-Fix: Use COPY for local files.
+**ADD instead of COPY**
+- Prefer COPY unless ADD behavior required
 
-**6. curl | bash**  
-Rule: Never pipe remote scripts to shell without verification.  
-Detect: curl ... | sh, wget ... | bash.  
-Fix: Download, verify checksum/signature, pin version.
+**curl | bash**
+- Never pipe remote scripts to shell without verification
+- Download, verify checksum/signature, pin version
 
-## Medium severity
+## Medium Severity Issues
 
-**7. File permissions**  
-Rule: Correct ownership and least privilege.  
-Fix: COPY --chown=user:group; minimal chmod.
+**File permissions**
+- Use COPY --chown=user:group
+- Apply minimal chmod
 
-**8. Privileged assumptions**  
-Rule: Do not assume privileged runtime.  
-Fix: Document required capabilities; prefer non-privileged design.
+## Verification Checklist
 
-## Verification checklist
-
-- [ ] Final stage runs as non-root (USER set)
+- [ ] Final stage runs as non-root
 - [ ] No secrets in ARG/ENV/RUN/COPY
 - [ ] Base image pinned (digest or version)
 - [ ] No unverified curl|bash
-- [ ] Multi-stage build (build deps not in runtime)
+- [ ] Multi-stage build used
 - [ ] Package caches cleaned
-- [ ] Permissions/ownership minimized
