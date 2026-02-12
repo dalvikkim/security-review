@@ -1,16 +1,248 @@
+# Domain Keywords Map
+# Maps code patterns/keywords to security domains and corresponding reference files
+
+# Authentication & Authorization
+authn-authz:
+  keywords:
+    - "login"
+    - "logout"
+    - "authenticate"
+    - "authorize"
+    - "session"
+    - "token"
+    - "jwt"
+    - "oauth"
+    - "permission"
+    - "role"
+    - "isAdmin"
+    - "isAuthenticated"
+    - "@PreAuthorize"
+    - "@Secured"
+    - "passport"
+    - "bcrypt"
+    - "argon2"
+  reference: "authn-authz-security.md"
+  priority: 100
+
+# Secrets Management
 secrets-management:
   keywords:
-    - "password:"
+    - "password"
     - "passwd"
     - "pwd"
     - "passphrase"
     - "clientSecret"
     - "apiSecret"
-    - "empty password"
+    - "apiKey"
+    - "API_KEY"
+    - "SECRET_KEY"
+    - "PRIVATE_KEY"
+    - "accessToken"
+    - "refreshToken"
+    - "connectionString"
   red_flags:
-    - 'password:\s*""'
-    - 'password\s*=\s*""'
-    - 'passwd:\s*""'
+    - 'password\s*[=:]\s*["\x27][^"\x27]+'
+    - 'apiKey\s*[=:]\s*["\x27][^"\x27]+'
+    - 'secret\s*[=:]\s*["\x27][^"\x27]+'
+  reference: "secrets-management-security.md"
+  priority: 100
+
+# SSRF
+ssrf:
+  keywords:
+    - "fetch("
+    - "axios("
+    - "requests.get"
+    - "requests.post"
+    - "http.Get"
+    - "http.Post"
+    - "HttpClient"
+    - "urllib"
+    - "curl"
+    - "wget"
+    - "webhook"
+    - "callback"
+    - "redirect"
+  reference: "ssrf-security.md"
+  priority: 95
+
+# RCE / Command Execution
+rce:
+  keywords:
+    - "exec("
+    - "eval("
+    - "system("
+    - "popen("
+    - "subprocess"
+    - "shell=True"
+    - "child_process"
+    - "Runtime.exec"
+    - "ProcessBuilder"
+    - "os.system"
+    - "os.popen"
+    - "sh -c"
+    - "bash -c"
+    - "cmd.exe"
+  reference: "rce-command-exec-security.md"
+  priority: 95
+
+# File Upload/Download
+file-operations:
+  keywords:
+    - "upload"
+    - "download"
+    - "file"
+    - "multipart"
+    - "attachment"
+    - "Content-Disposition"
+    - "multer"
+    - "formidable"
+    - "FileUpload"
+    - "InputStream"
+    - "OutputStream"
+    - "writeFile"
+    - "readFile"
+    - "path.join"
+    - "os.path"
+  reference: "file-upload-download-security.md"
+  priority: 90
+
+# Input Validation / Injection
+input-validation:
+  keywords:
+    - "query"
+    - "execute"
+    - "SELECT"
+    - "INSERT"
+    - "UPDATE"
+    - "DELETE"
+    - "WHERE"
+    - "db.query"
+    - "cursor.execute"
+    - "Statement"
+    - "PreparedStatement"
+    - "innerHTML"
+    - "dangerouslySetInnerHTML"
+    - "v-html"
+    - "render"
+    - "template"
+  reference: "input-validation-security.md"
+  priority: 95
+
+# Parameter Tampering / IDOR
+parameter-tampering:
+  keywords:
+    - "req.params"
+    - "req.body"
+    - "req.query"
+    - "request.form"
+    - "request.args"
+    - "request.GET"
+    - "request.POST"
+    - "getParameter"
+    - "@PathVariable"
+    - "@RequestParam"
+    - "@RequestBody"
+    - "hidden"
+    - "price"
+    - "quantity"
+    - "userId"
+    - "orderId"
+    - "isAdmin"
+    - "role"
+  reference: "parameter-tampering-security.md"
+  priority: 95
+
+# Container Build
+container-build:
+  keywords:
+    - "Dockerfile"
+    - "FROM"
+    - "USER"
+    - "ADD"
+    - "COPY"
+    - "RUN"
+    - "ENTRYPOINT"
+    - "CMD"
+    - "EXPOSE"
+    - "ENV"
+    - "ARG"
+    - "apt-get"
+    - "apk add"
+    - "yum install"
+  red_flags:
+    - "FROM\\s+.+:latest"
+    - "^\\s*USER\\s+root"
+    - "curl\\s+.+\\|\\s*(sh|bash)"
+    - "wget\\s+.+\\|\\s*(sh|bash)"
+  reference: "docker-container-security.md"
+  priority: 95
+
+# Cryptography
+cryptography:
+  keywords:
+    - "crypto"
+    - "cipher"
+    - "encrypt"
+    - "decrypt"
+    - "hash"
+    - "md5"
+    - "sha1"
+    - "sha256"
+    - "aes"
+    - "rsa"
+    - "hmac"
+    - "pbkdf2"
+    - "bcrypt"
+    - "argon2"
+    - "random"
+    - "SecureRandom"
+    - "CSPRNG"
+  reference: "crypto-security.md"
+  priority: 90
+
+# AI/LLM
+ai-llm:
+  keywords:
+    - "openai"
+    - "anthropic"
+    - "llm"
+    - "gpt"
+    - "claude"
+    - "prompt"
+    - "completion"
+    - "chat"
+    - "embedding"
+    - "langchain"
+    - "llamaindex"
+    - "agent"
+    - "tool_call"
+    - "function_call"
+    - "rag"
+    - "retrieval"
+  reference: "ai-llm-security.md"
+  priority: 95
+
+# Backdoor Detection
+backdoor:
+  keywords:
+    - "backdoor"
+    - "bypass"
+    - "debug"
+    - "admin"
+    - "master"
+    - "override"
+    - "secret"
+    - "hidden"
+    - "undocumented"
+  red_flags:
+    - 'if\s*\(\s*password\s*==\s*["\x27]'
+    - 'if\s*\(\s*token\s*==\s*["\x27]'
+    - 'if\s*\(\s*key\s*==\s*["\x27]'
+  reference: "backdoor-malicious-behavior-security.md"
+  priority: 90
+
+# Policies
 policies:
   do_not_send_domains:
     - secrets-management
@@ -18,9 +250,4 @@ policies:
   do_not_send_rules:
     - hardcoded-credential
     - hardcoded-api-key
-container-build:
-  keywords: ["Dockerfile", "FROM", "USER", "ADD", "apt-get", "apk add"]
-  red_flags:
-    - "FROM\\s+.+:latest"
-    - "^\\s*USER\\s+root"
-    - "curl\\s+.+\\|\\s*(sh|bash)"
+    - private-key-content

@@ -1,11 +1,119 @@
+# Stack Detection Map
+# Maps file patterns to stack types and corresponding reference files
+
 container:
   evidence:
     - "Dockerfile"
     - "docker-compose.yml"
+    - "docker-compose.yaml"
     - ".dockerignore"
+    - "compose.yml"
+    - "compose.yaml"
+  reference: "docker-container-security.md"
+  priority: 95
+
+kubernetes:
+  evidence:
+    - "kubernetes/"
+    - "k8s/"
+    - "helm/"
+    - "Chart.yaml"
+    - "values.yaml"
+    - "deployment.yaml"
+    - "service.yaml"
+  reference: "docker-container-security.md"
+  priority: 90
 
 ci-cd:
   evidence:
     - ".github/workflows/"
     - "Jenkinsfile"
     - ".gitlab-ci.yml"
+    - ".circleci/"
+    - "azure-pipelines.yml"
+    - ".travis.yml"
+    - "bitbucket-pipelines.yml"
+  reference: "ci-cd-general-security.md"
+  priority: 90
+
+api:
+  evidence:
+    - "openapi.yaml"
+    - "openapi.json"
+    - "swagger.yaml"
+    - "swagger.json"
+    - "**/routes/"
+    - "**/controllers/"
+    - "**/api/"
+  reference: "api-general-security.md"
+  priority: 85
+
+web-backend:
+  evidence:
+    - "**/views/"
+    - "**/templates/"
+    - "server.js"
+    - "app.py"
+    - "main.go"
+  reference: "web-backend-general-security.md"
+  priority: 80
+
+# Language detection
+python:
+  evidence:
+    - "*.py"
+    - "requirements.txt"
+    - "pyproject.toml"
+    - "setup.py"
+    - "Pipfile"
+  reference: "python-general-security.md"
+  priority: 80
+
+javascript:
+  evidence:
+    - "*.js"
+    - "*.ts"
+    - "*.mjs"
+    - "package.json"
+    - "tsconfig.json"
+  reference: "javascript-general-security.md"
+  priority: 80
+
+java:
+  evidence:
+    - "*.java"
+    - "pom.xml"
+    - "build.gradle"
+    - "build.gradle.kts"
+  reference: "java-general-security.md"
+  priority: 80
+
+go:
+  evidence:
+    - "*.go"
+    - "go.mod"
+    - "go.sum"
+  reference: "go-general-security.md"
+  priority: 80
+
+c-cpp:
+  evidence:
+    - "*.c"
+    - "*.cpp"
+    - "*.h"
+    - "*.hpp"
+    - "Makefile"
+    - "CMakeLists.txt"
+  reference: "c-general-security.md"
+  priority: 80
+
+vuejs:
+  evidence:
+    - "*.vue"
+    - "vite.config.js"
+    - "vite.config.ts"
+    - "nuxt.config.js"
+    - "nuxt.config.ts"
+    - "vue.config.js"
+  reference: "vuejs-general-security.md"
+  priority: 75

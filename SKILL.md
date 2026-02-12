@@ -60,13 +60,36 @@ If ambiguous, ask user to confirm.
 
 ## 2. Workflow
 
-### Step 1: Context Identification
+### Step 1: Context Identification (File-Based Detection)
 
-Identify before analyzing:
-- Language(s) and Framework(s)
-- Runtime type (API / CLI / Agent / Web / Infra)
-- Architectural role
-- Security-sensitive domains (auth, file I/O, networking, secrets, AI, etc.)
+**MUST scan the project for these indicators before analysis:**
+
+#### Infrastructure Files (Check First)
+| File Pattern | Stack Type | Reference to Load |
+|--------------|------------|-------------------|
+| `Dockerfile`, `docker-compose.yml`, `.dockerignore` | container | `docker-container-security.md` |
+| `.github/workflows/*.yml`, `Jenkinsfile`, `.gitlab-ci.yml` | ci-cd | `ci-cd-general-security.md` |
+| `kubernetes/*.yaml`, `k8s/*.yaml`, `helm/` | kubernetes | `docker-container-security.md` |
+
+#### Language Detection
+| File Pattern | Language | Reference to Load |
+|--------------|----------|-------------------|
+| `*.py`, `requirements.txt`, `pyproject.toml` | Python | `python-general-security.md` |
+| `*.js`, `*.ts`, `package.json` | JavaScript/TypeScript | `javascript-general-security.md` |
+| `*.java`, `pom.xml`, `build.gradle` | Java | `java-general-security.md` |
+| `*.go`, `go.mod` | Go | `go-general-security.md` |
+| `*.c`, `*.cpp`, `*.h`, `Makefile` | C/C++ | `c-general-security.md` |
+| `*.vue`, `vite.config.*`, `nuxt.config.*` | Vue.js | `vuejs-general-security.md` |
+
+#### Runtime Type Classification
+- **API**: REST/GraphQL endpoints, OpenAPI specs
+- **Web Backend**: Server-rendered apps, session handling
+- **CLI**: Command-line tools, scripts
+- **Agent/AI**: LLM integrations, tool-calling code
+- **Container**: Dockerfile present, container orchestration
+- **CI/CD**: Pipeline definitions, deployment scripts
+
+**Action**: List all detected contexts and load ALL matching references.
 
 State assumptions clearly.
 
@@ -79,12 +102,14 @@ Identify:
 - Secrets usage
 - Privileged operations
 - Inter-service communication
+- Container boundaries and privileges
+- CI/CD pipeline trust boundaries
 
 No findings may be produced before attack surface mapping.
 
 ### Step 3: Reference Loading
 
-Load relevant documentation in priority order:
+**Load ALL relevant references based on Step 1 detection.**
 
 **Priority Hierarchy:**
 1. Project-specific guidance (if available)
@@ -92,12 +117,21 @@ Load relevant documentation in priority order:
 3. Official framework documentation
 4. OWASP / ASVS / CERT / NIST standards
 
-**Reference file selection:**
+**Reference file selection (load multiple if applicable):**
 1. **Language-specific:** `{language}-general-security.md`
 2. **Domain-specific:** `{domain}-security.md`
 3. **Stack-specific:** `{stack}-general-security.md`
 
-Use `stack-map.yml` and `domain-keywords.yml` for routing assistance.
+**Routing Rules:**
+- If `Dockerfile` exists → MUST load `docker-container-security.md`
+- If `.github/workflows/` exists → MUST load `ci-cd-general-security.md`
+- If API endpoints detected → MUST load `api-general-security.md`
+- If authentication code detected → MUST load `authn-authz-security.md`
+- If file upload/download detected → MUST load `file-upload-download-security.md`
+- If outbound HTTP requests detected → MUST load `ssrf-security.md`
+- If command execution detected → MUST load `rce-command-exec-security.md`
+
+Use `stack-map.yml` and `domain-keywords.yml` patterns for detection.
 
 Never rely on generic OWASP rules if a more specific reference exists.
 
