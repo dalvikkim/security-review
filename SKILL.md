@@ -98,16 +98,18 @@ Security guidance MUST be applied using the following priority order:
 
 1. **Project-provided or organization-specific guidance**
 2. **Skill references directory**, if available, using the following matching order:
-   - `<language>-<framework>-<stack>-security.md`
-   - `<language>-general-<stack>-security.md`
-   - `<stack>-general-security.md`
-   - `<domain>-security.md`
+   - `<domain>-security.md` (vulnerability-specific guides)
+   - `<stack>-general-security.md` (architectural guides)
+   - `language-specific-security.md` (language-unique patterns)
 3. **Official documentation** for the language/framework
 4. **Widely accepted security standards**, such as:
-   - OWASP Top 10
-   - OWASP ASVS
+   - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+   - [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/)
+   - [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
+   - [CWE (Common Weakness Enumeration)](https://cwe.mitre.org/)
+   - [NIST Secure Software Development Framework](https://csrc.nist.gov/projects/ssdf)
    - CERT Secure Coding Guidelines
-   - NIST recommendations
+   - [Web Security Academy](https://portswigger.net/web-security)
 
 If no concrete guidance exists:
 - Proceed cautiously
@@ -153,7 +155,7 @@ When explicitly requested:
 
 When producing a report:
 
-- Write the report as a Markdown file  
+- Write the report as a Markdown file
   Default filename: `security_review_report.md`
 - Ask the user for a preferred location if not specified
 
@@ -169,7 +171,8 @@ When producing a report:
 
 Each finding MUST include:
 - A numeric ID
-- Severity level
+- Severity level (Critical / High / Medium / Low / Informational)
+- CWE ID (if applicable)
 - A short description
 - A one-sentence impact statement for Critical findings
 - Code references with line numbers (if applicable)
@@ -191,7 +194,7 @@ If fixes are requested:
   - Why the previous approach was risky
 - Carefully consider backward compatibility and regressions
 - Warn the user if behavior or assumptions may change
-- Follow the project’s existing commit and testing workflows
+- Follow the project's existing commit and testing workflows
 
 Avoid bundling unrelated security fixes into a single change.
 
@@ -211,16 +214,103 @@ When encountering an override:
 
 ---
 
-## General Security Principles (Language-Agnostic)
+## Common Security Principles (Language-Agnostic)
 
-### Avoid Predictable Public Identifiers
+The following principles apply universally across all languages and frameworks.
 
-Do not expose auto-incrementing or sequential IDs in public interfaces.  
+### Input Validation
+
+- **Allowlist over denylist**: Define what is allowed, reject everything else
+- **Validate at trust boundaries**: All external input is untrusted
+- **Type, length, format, range**: Check all dimensions
+- **Centralize validation logic**: Use schemas, DTOs, or validation libraries
+- **Never trust client-side validation alone**
+
+### Output Encoding
+
+- **Context-aware encoding**: HTML, URL, JavaScript, SQL contexts require different encoding
+- **Use framework defaults**: Most frameworks auto-escape; don't disable without reason
+- **Sanitize before rendering**: Especially for user-generated content
+
+### Authentication & Authorization
+
+- **Authenticate at the server**: Never rely on client-side auth checks
+- **Authorize every action**: Check permissions at the service/domain level, not just UI
+- **Use proven libraries**: Avoid custom crypto or auth implementations
+- **Implement proper session management**: Secure tokens, expiration, rotation
+
+### Secrets Management
+
+- **Never hardcode secrets**: Use environment variables or secret managers
+- **Never log secrets**: Mask sensitive data in logs and error messages
+- **Rotate regularly**: Implement rotation strategies for all credentials
+- **Least privilege**: Each service gets only the secrets it needs
+
+### Secure Communication
+
+- **Use TLS/HTTPS**: Encrypt data in transit
+- **Validate certificates**: Don't disable certificate verification
+- **Secure cookies**: Use HttpOnly, Secure, SameSite attributes appropriately
+
+### Error Handling & Logging
+
+- **Generic error messages to users**: Don't expose internal details
+- **Detailed logs for operators**: Include context but mask sensitive data
+- **Fail securely**: Default to deny on errors
+
+### Dependency Management
+
+- **Pin versions**: Use lockfiles and specific versions
+- **Regular updates**: Monitor and apply security patches
+- **Scan for vulnerabilities**: Use automated tools (Dependabot, Snyk, etc.)
+- **Verify integrity**: Check checksums/signatures for critical dependencies
+
+---
+
+## Severity Classification Guidelines
+
+### Critical
+- Remote Code Execution (RCE)
+- Authentication bypass
+- SQL Injection with data access
+- Hardcoded production credentials
+- Unvalidated deserialization of untrusted data
+
+### High
+- Stored XSS
+- SSRF with internal network access
+- Authorization bypass (privilege escalation)
+- Path traversal with sensitive file access
+- Insecure direct object reference (IDOR)
+
+### Medium
+- Reflected XSS
+- CSRF on sensitive actions
+- Information disclosure (non-sensitive)
+- Missing security headers
+- Weak cryptographic algorithms
+
+### Low
+- Verbose error messages
+- Missing rate limiting
+- Outdated dependencies (no known exploits)
+- Minor information leaks
+
+### Informational
+- Security best practice suggestions
+- Defense-in-depth recommendations
+- Code quality observations with security implications
+
+---
+
+## Avoid Predictable Public Identifiers
+
+Do not expose auto-incrementing or sequential IDs in public interfaces.
 Prefer UUIDv4 or cryptographically random identifiers.
 
 ---
 
-### TLS Considerations
+## TLS Considerations
 
 - Do not report missing TLS as a vulnerability by default
 - Many development and internal environments rely on upstream TLS termination
@@ -238,3 +328,41 @@ It is a **security expert behavioral contract** that prioritizes:
 - High-impact issues over noise
 - Practical remediation over theoretical perfection
 - Respect for real-world project constraints
+
+---
+
+## Reference Documents
+
+The `references/` directory contains detailed security guidance for specific domains, stacks, and scenarios.
+
+### Document Loading Priority
+
+1. Domain-specific guides (highest priority for specific vulnerabilities)
+2. Stack-specific guides (for architectural patterns)
+3. Language-specific guidance (for language-unique concerns)
+4. General checklist (for comprehensive review)
+
+### Available References
+
+| File | Scope | Use When |
+|------|-------|----------|
+| `authn-authz-security.md` | Authentication & Authorization | Reviewing login, session, permission logic |
+| `secrets-management-security.md` | Secrets & Credentials | Detecting hardcoded secrets, reviewing secret handling |
+| `input-validation-security.md` | Input Handling | Reviewing data parsing, validation |
+| `rce-command-exec-security.md` | Command Execution | Code executes OS commands or shells |
+| `ssrf-security.md` | Server-Side Request Forgery | Code makes outbound HTTP requests |
+| `file-upload-download-security.md` | File Operations | File upload/download functionality |
+| `backdoor-malicious-behavior-security.md` | Backdoor Detection | Suspicious patterns, hidden functionality |
+| `api-general-security.md` | API Security | REST/GraphQL API endpoints |
+| `web-backend-general-security.md` | Web Backend | Server-side web applications |
+| `docker-container-security.md` | Container Security | Dockerfile, container images |
+| `ci-cd-general-security.md` | CI/CD Pipelines | Build and deployment security |
+| `language-specific-security.md` | Language Specifics | Language-unique vulnerabilities and patterns |
+| `code-review-security-checklist.md` | Comprehensive Checklist | Final review verification |
+
+### Conflict Resolution
+
+When multiple documents apply:
+- **Domain guides take precedence** over stack guides
+- **More specific guidance** takes precedence over general guidance
+- When in doubt, apply the **more restrictive** recommendation
