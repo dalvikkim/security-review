@@ -97,11 +97,11 @@ If the language or framework is unclear:
 Security guidance MUST be applied using the following priority order:
 
 1. **Project-provided or organization-specific guidance**
-2. **Skill references directory**, if available, using the following matching order:
-   - `<language>-<framework>-<stack>-security.md`
-   - `<language>-general-<stack>-security.md`
-   - `<stack>-general-security.md`
-   - `<domain>-security.md`
+2. **Skill references directory** (`references/`), if available:
+   - **Entry point:** `references/index.md` — lists reference files by category and load order.
+   - **Matching order:** `<language>-<framework>-<stack>-security.md` → `<language>-general-security.md` → `<stack>-general-security.md` → `<domain>-security.md`.
+   - **Frontmatter:** Each reference may declare `scope` (stack/domain/language), `priority` (number), and optional `applies_to` (list). Higher priority wins when multiple apply.
+   - **Mappings:** `stack-map.yml` and `domain-keywords.yml` support stack/domain detection; use only for routing, not as standalone guidance.
 3. **Official documentation** for the language/framework
 4. **Widely accepted security standards**, such as:
    - OWASP Top 10
@@ -113,6 +113,8 @@ If no concrete guidance exists:
 - Proceed cautiously
 - Focus on high-confidence, high-impact security issues
 - Explicitly state that guidance is based on general security principles
+
+**Do-Not-Send and redaction rules** are defined only in this SKILL.md (see "Sensitive Findings Handling"). Reference documents must not repeat raw secret values or send secret-containing findings to the LLM; they may refer to "See SKILL.md" for that policy.
 
 ---
 

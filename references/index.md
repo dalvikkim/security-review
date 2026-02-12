@@ -1,39 +1,55 @@
-# Security Best Practices Reference Index
+# Security Reference Index
 
-이 문서는 `references/` 디렉토리의 **진입점(index)** 입니다.
-
-Agent는 이 문서를 참고하여:
-- 어떤 문서가 어떤 상황에 적합한지
-- 어떤 순서로 문서를 로드해야 하는지
-를 판단합니다.
+Entry point for loading reference documents. Use this to decide which documents apply and in what order.
 
 ---
 
-## Core Stack Guides (우선)
+## Stack guides (priority)
 
-- stacks/api-general-security.md
-- stacks/web-backend-general-security.md
+- api-general-security.md
+- web-backend-general-security.md
+- ci-cd-general-security.md
+- docker-container-security.md
 
 ---
 
-## Core Domain Guides (MVP)
+## Domain guides
 
-- domains/authn-authz-security.md
-- domains/input-validation-security.md
-- domains/secrets-management-security.md
-- domains/file-upload-download-security.md
-- domains/ssrf-security.md
+- authn-authz-security.md
+- input-validation-security.md
+- secrets-management-security.md
+- file-upload-download-security.md
+- ssrf-security.md
+- rce-command-exec-security.md
+- backdoor-malicious-behavior-security.md
+
+---
+
+## Language guides
+
+- javascript-general-security.md
+- python-general-security.md
+- java-general-security.md
+- go-general-security.md
+- c-general-security.md
+- vuejs-general-security.md
 
 ---
 
 ## Checklists
 
-- checklists/code-review-security-checklist.md
+- code-review-security-checklist.md
 
 ---
 
-## Usage Notes
+## Mappings (routing / detection)
 
-- Stack 가이드는 **전체 구조의 기본값**
-- Domain 가이드는 **취약점/기능 단위의 세부 규칙**
-- 둘이 충돌할 경우 **Domain 가이드 우선**
+- stack-map.yml
+- domain-keywords.yml
+
+---
+
+## Usage
+
+- **Stack guides** define defaults for overall architecture.
+- **Domain guides** define rules for specific vulnerability/feature areas; they override stack guides when both apply.

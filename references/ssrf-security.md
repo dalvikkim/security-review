@@ -1,106 +1,67 @@
 ---
 scope:
   domain: ["ssrf"]
+priority: 95
 applies_to:
   - "services making outbound HTTP/HTTPS requests"
   - "URL, webhook, callback, proxy features"
-priority: 95
 ---
 
-# Server-Side Request Forgery (SSRF) Security
+# SSRF Security
 
 ## Overview
 
-SSRF는 서버가 공격자가 지정한 URL로 요청을 보내도록 유도하여  
-**내부 네트워크 접근, 메타데이터 탈취, 권한 상승**으로 이어질 수 있는 고위험 취약점입니다.
+SSRF lets an attacker make the server request attacker-controlled URLs, leading to internal network access, metadata theft, or privilege escalation. Applies to any code that performs outbound requests.
 
-언어·프레임워크와 무관하게 **외부 요청을 만드는 모든 코드**에 적용됩니다.
+## Entry points
 
----
+- URL parameters, webhook/callback URLs
+- File download via URL, proxy/fetch/scraper features
+- LLM tool/agent URL fetch
 
-## Common SSRF Entry Points
+## Secure defaults
 
-- URL 입력 파라미터
-- Webhook / Callback URL
-- File download via URL
-- Proxy / Fetch / Scraper 기능
-- LLM tool / agent에서의 URL fetch
+- Never request user-supplied URLs directly.
+- Block access to internal networks by default.
+- Minimize outbound requests.
 
----
+## High-risk targets
 
-## Secure Defaults
+- localhost, 127.0.0.1
+- 169.254.169.254 (cloud metadata)
+- 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+- file:// or Unix sockets
 
-- 사용자 입력 URL을 **직접 요청하지 않는다**
-- 내부 네트워크 접근 기본 차단
-- 아웃바운드 네트워크는 최소화
+## Defenses
 
----
-
-## High-Risk Targets
-
-- `localhost`, `127.0.0.1`
-- `169.254.169.254` (cloud metadata)
-- `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`
-- Unix socket / file scheme (`file://`)
-
----
-
-## Recommended Defenses
-
-### Input Validation
-- URL allowlist 기반 검증
-- Scheme 제한 (`https` only)
-- IP 직접 입력 차단
-
-### Network Controls
-- Egress firewall 규칙
-- Metadata endpoint 차단
-- DNS rebind 방어 고려
-
-### Request Handling
-- Redirect 제한 또는 비활성화
-- Timeout, response size 제한
-
----
+- **Input:** URL allowlist, restrict scheme (e.g. https only), block raw IP.
+- **Network:** Egress firewall, block metadata endpoints, consider DNS rebinding.
+- **Request:** Limit redirects, set timeout and response size limits.
 
 ## Do
 
-- URL 파싱 후 host/IP 재검증
-- DNS resolve 결과 검사
-- 내부 IP 대역 차단
-- 외부 호출 기능 최소화
-
----
+- Re-validate host/IP after parsing URL.
+- Check DNS result against allowlist/blocklist.
+- Block internal IP ranges.
+- Minimize outbound call surface.
 
 ## Don't
 
-- `fetch(userInputUrl)` 직접 호출
-- 단순 문자열 검증으로 URL 필터링
-- Redirect를 무제한 허용
-- “외부 API니까 안전하다”는 가정
+- Call `fetch(userInputUrl)` or equivalent without validation.
+- Rely on string checks alone for URL filtering.
+- Allow unlimited redirects.
+- Assume "external API" implies safety.
 
----
+## High-risk patterns
 
-## High-Risk Patterns
+- Passing URL directly to HTTP client.
+- Storing webhook URL in DB and reusing without re-validation.
+- LLM agent able to fetch arbitrary URLs.
+- Invoking curl/wget with user-controlled URL.
 
-- URL을 그대로 HTTP client에 전달
-- Webhook URL을 DB에 저장 후 재사용
-- LLM Agent가 임의 URL을 fetch 가능
-- `curl`, `wget` 등 OS 명령 호출
+## Verification checklist
 
----
-
-## Verification Checklist
-
-- [ ] 사용자 입력 기반 URL 요청 여부
-- [ ] 내부 IP / metadata 접근 차단
-- [ ] Redirect 제한 여부
-- [ ] Egress 네트워크 정책 존재 여부
-
----
-
-## Notes
-
-- SSRF는 **기능 요구사항 때문에 자주 방치됨**
-- “내부에서만 쓰는 기능”이라는 가정은 위험
-- 클라우드 환경에서는 metadata 접근이 치명적
+- [ ] No user-controlled URL used for outbound request without validation
+- [ ] Internal IP and metadata access blocked
+- [ ] Redirect handling limited
+- [ ] Egress policy documented or enforced

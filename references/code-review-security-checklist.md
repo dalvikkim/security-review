@@ -1,17 +1,21 @@
-# Code Review – Security Checklist (MVP)
+# Code Review – Security Checklist
 
 ## Authentication / Authorization
-- [ ] 모든 민감 API 인증 여부
-- [ ] 권한 체크 누락 여부
 
-## Input Handling
-- [ ] 입력 검증 존재 여부
-- [ ] 외부 입력 직접 사용 여부
+- [ ] All sensitive APIs require authentication
+- [ ] No missing authorization checks
+
+## Input handling
+
+- [ ] Input validation present
+- [ ] No direct use of untrusted input in sensitive operations
 
 ## Secrets
-- [ ] 하드코딩된 비밀정보
-- [ ] 로그 노출 여부
+
+- [ ] No hardcoded secrets
+- [ ] No secrets in logs
 
 ## Files
-- [ ] 업로드 파일 검증
-- [ ] 경로 조작 가능성
+
+- [ ] Uploaded files validated
+- [ ] Path manipulation prevented

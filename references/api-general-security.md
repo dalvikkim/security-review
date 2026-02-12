@@ -4,32 +4,28 @@ scope:
 priority: 90
 ---
 
-# API General Security Best Practices
+# API General Security
 
-## Secure Defaults
+## Secure defaults
 
-- 모든 API는 인증을 기본으로 요구
-- 명시적으로 public endpoint만 인증 예외 처리
-- JSON schema 또는 DTO 기반 입력 검증 필수
-
----
+- Require authentication for all APIs by default.
+- Exempt only explicitly designated public endpoints.
+- Validate input with JSON schema or DTOs.
 
 ## Do
 
-- Rate limiting 적용
-- 인증/인가 실패 메시지 최소화
-- OpenAPI 문서와 실제 구현 동기화
+- Apply rate limiting.
+- Minimize auth/authz failure messages.
+- Keep OpenAPI docs in sync with implementation.
 
 ## Don't
 
-- 인증 없는 write API 제공
-- 에러 메시지에 내부 스택 노출
-- 요청 바디 그대로 DB/OS 호출에 사용
+- Expose write APIs without authentication.
+- Expose internal stack details in error messages.
+- Use request body directly in DB/OS calls without validation.
 
----
+## Verification checklist
 
-## Verification Checklist
-
-- [ ] 인증 미적용 엔드포인트 존재 여부
-- [ ] 입력값 타입/범위 검증
-- [ ] 과도한 응답 데이터 반환 여부
+- [ ] Unauthenticated endpoints identified and justified
+- [ ] Input type/range validation in place
+- [ ] Response data minimized (no over-exposure)

@@ -6,22 +6,20 @@ priority: 85
 
 # Web Backend General Security
 
-## Secure Defaults
+## Secure defaults
 
-- CSRF 보호 기본 활성화
-- 세션은 서버 검증 기반
-- 파일 시스템 직접 접근 최소화
+- Enable CSRF protection by default.
+- Use server-validated sessions.
+- Minimize direct filesystem access from request handling.
 
-## Common Pitfalls
+## Common pitfalls
 
-- 프레임워크 기본 설정을 그대로 신뢰
-- 디버그 모드 상시 활성화
-- 내부 IP/URL 하드코딩
+- Trusting framework defaults without review.
+- Leaving debug mode enabled.
+- Hardcoding internal IPs/URLs.
 
----
+## Verification checklist
 
-## Verification Checklist
-
-- [ ] CSRF 토큰 검증
-- [ ] Debug/Dev 설정 분리
-- [ ] 세션 탈취 가능성
+- [ ] CSRF token verification
+- [ ] Debug/dev settings separated from production
+- [ ] Session hijacking mitigations considered
