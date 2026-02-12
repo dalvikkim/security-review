@@ -149,6 +149,18 @@
 | **안전하지 않은 세션 설정** | httpOnly, secure, sameSite 미설정 | Web Backend |
 | **상세한 에러 메시지** | 스택 트레이스가 클라이언트에 노출 | 모든 환경 |
 
+
+### 16. 파라미터 변조 (Parameter Tampering)
+
+| 취약점 유형 | 설명 | 대상 언어/환경 |
+|------------|------|---------------|
+| **IDOR** | 객체 ID 변경으로 타인 리소스 접근 (`/orders/123` → `/orders/456`) | 모든 API |
+| **권한 파라미터 변조** | `role=admin`, `isAdmin=true` 등 권한 파라미터 조작 | 모든 환경 |
+| **가격/수량 변조** | 결제 시 price, quantity 값 조작 | E-commerce, 결제 시스템 |
+| **Hidden Field 변조** | 숨겨진 폼 필드(user_id, discount_code) 조작 | Web Backend |
+| **타입 혼동** | 문자열 대신 배열 전송 (`id[]=1&id[]=2`) | 모든 환경 |
+| **상태 파라미터 변조** | 주문 상태, 결제 상태 등 직접 변경 시도 | 모든 환경 |
+
 ---
 
 ## 지원 언어 및 프레임워크
@@ -172,6 +184,7 @@
 | Web Backend | `web-backend-general-security.md` |
 | Docker/Container | `docker-container-security.md` |
 | CI/CD | `ci-cd-general-security.md` |
+| Parameter Tampering / IDOR | `parameter-tampering-security.md` |
 
 ---
 
@@ -259,6 +272,7 @@ references/
 ├── backdoor-malicious-behavior-security.md
 ├── docker-container-security.md
 ├── javascript-general-security.md
+├── parameter-tampering-security.md
 ├── python-general-security.md
 ├── java-general-security.md
 ├── go-general-security.md
