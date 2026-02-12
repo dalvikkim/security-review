@@ -35,6 +35,8 @@ They are used only as routing anchors — detailed rules MUST be loaded from `re
 - RCE / Command execution
 - Backdoor / Malicious behavior
 - Parameter Tampering / IDOR
+- Container / Docker security
+- CI/CD pipeline security
 - AI/LLM Prompt Injection (if applicable)
 
 SKILL.md does NOT define implementation rules.
