@@ -161,6 +161,28 @@
 | **타입 혼동** | 문자열 대신 배열 전송 (`id[]=1&id[]=2`) | 모든 환경 |
 | **상태 파라미터 변조** | 주문 상태, 결제 상태 등 직접 변경 시도 | 모든 환경 |
 
+### 17. 암호화 오용 (Cryptographic Misuse)
+
+| 취약점 유형 | 설명 | 대상 언어/환경 |
+|------------|------|---------------|
+| **약한 해시 알고리즘** | MD5, SHA1을 비밀번호 해싱에 사용 | 모든 언어 |
+| **ECB 모드 사용** | AES-ECB 등 안전하지 않은 암호화 모드 | 모든 언어 |
+| **하드코딩된 암호화 키** | 소스 코드에 암호화 키 직접 작성 | 모든 언어 |
+| **IV/Nonce 재사용** | 동일한 IV/Nonce를 여러 암호화에 재사용 | 모든 언어 |
+| **안전하지 않은 난수 생성** | `Math.random()`, `random.random()` 등 보안 목적 사용 | 모든 언어 |
+| **커스텀 암호화** | 자체 구현한 암호화 알고리즘 사용 | 모든 언어 |
+
+### 18. AI/LLM 보안 (AI/LLM Security)
+
+| 취약점 유형 | 설명 | 대상 언어/환경 |
+|------------|------|---------------|
+| **직접 프롬프트 인젝션** | 사용자 입력이 프롬프트에 직접 삽입 | AI/LLM 환경 |
+| **간접 프롬프트 인젝션** | RAG 문서, 외부 데이터에 악성 프롬프트 삽입 | AI/LLM 환경 |
+| **도구 실행 권한 과다** | Agent에 과도한 도구 접근 권한 부여 | AI Agent |
+| **LLM 출력 직접 실행** | LLM 생성 코드/명령어 검증 없이 실행 | AI/LLM 환경 |
+| **민감 데이터 노출** | 시스템 프롬프트, PII가 LLM 응답에 노출 | AI/LLM 환경 |
+| **RAG 콘텐츠 미검증** | 검색된 문서 내용 검증 없이 사용 | RAG 시스템 |
+
 ---
 
 ## 지원 언어 및 프레임워크
@@ -185,6 +207,8 @@
 | Docker/Container | `docker-container-security.md` |
 | CI/CD | `ci-cd-general-security.md` |
 | Parameter Tampering / IDOR | `parameter-tampering-security.md` |
+| Cryptography | `crypto-security.md` |
+| AI/LLM | `ai-llm-security.md` |
 
 ---
 
@@ -271,8 +295,10 @@ references/
 ├── rce-command-exec-security.md
 ├── backdoor-malicious-behavior-security.md
 ├── docker-container-security.md
-├── javascript-general-security.md
 ├── parameter-tampering-security.md
+├── crypto-security.md
+├── ai-llm-security.md
+├── javascript-general-security.md
 ├── python-general-security.md
 ├── java-general-security.md
 ├── go-general-security.md
